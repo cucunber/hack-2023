@@ -1,0 +1,12 @@
+.mySwiper .swiper-slide {
+  width: 25%;
+  height: 100%;
+}
+
+.mySwiper img {
+  opacity: 0.4;
+}
+
+.mySwiper .activeSlide {
+  opacity: 1;
+}

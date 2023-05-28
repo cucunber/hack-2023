@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+mkdir -p static
+mkdir -p media
+python manage.py collectstatic --noinput
+python manage.py migrate
+# exec uvicorn config.asgi:application --host 0.0.0.0 --reload --reload-include '*.html'
+#exec gunicorn booking_service.wsgi:application  -w 2 -b :8000
+exec daphne -p 8000 -b 0.0.0.0  booking_service.asgi:application

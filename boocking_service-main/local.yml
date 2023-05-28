@@ -1,0 +1,102 @@
+version: '3'
+
+volumes:
+  booking_service_local_postgres_data: {}
+#  booking_service_local_postgres_data_backups: {}
+  booking_service_local_mongo_data: {}
+  booking_service_local_redis_data: {}
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile
+    image: booking_service_local_django
+    container_name: booking_service_local_django
+    depends_on:
+      - postgres
+      - mongo
+#      - redis
+    volumes:
+      - .:/app:z
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    command: /start
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/postgres/Dockerfile
+    image: booking_service_postgres
+    container_name: booking_service_local_postgres
+    volumes:
+      - booking_service_local_postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+  mongo:
+    build:
+      context: .
+      dockerfile: ./compose/mongo/Dockerfile
+    image: booking_service_mongo
+    volumes:
+      - booking_service_local_mongo_data:/data/db
+    container_name: booking_service_local_mongo
+    env_file:
+      - .env
+
+#  docs:
+#    image: testcookiecutter_local_docs
+#    container_name: testcookiecutter_local_docs
+#    build:
+#      context: .
+#      dockerfile: ./compose/local/docs/Dockerfile
+#    env_file:
+#      - ./.envs/.local/.django
+#    volumes:
+#      - ./docs:/docs:z
+#      - ./config:/app/config:z
+#      - ./testcookiecutter:/app/testcookiecutter:z
+#    ports:
+#      - "9000:9000"
+#    command: /start-docs
+#
+  redis:
+    build:
+      context: .
+      dockerfile: ./compose/redis/Dockerfile
+    image: booking_service_redis
+    container_name: booking_service_local_redis
+    volumes:
+      - booking_service_local_redis_data:/data/db
+    env_file:
+      - .env
+#
+#  celeryworker:
+#    <<: *django
+#    image: testcookiecutter_local_celeryworker
+#    container_name: testcookiecutter_local_celeryworker
+#    depends_on:
+#      - redis
+#      - postgres
+#    ports: []
+#    command: /start-celeryworker
+#
+#  celerybeat:
+#    <<: *django
+#    image: testcookiecutter_local_celerybeat
+#    container_name: testcookiecutter_local_celerybeat
+#    depends_on:
+#      - redis
+#      - postgres
+#    ports: []
+#    command: /start-celerybeat
+#
+#  flower:
+#    <<: *django
+#    image: testcookiecutter_local_flower
+#    container_name: testcookiecutter_local_flower
+#    ports:
+#      - "5555:5555"
+#    command: /start-flower
